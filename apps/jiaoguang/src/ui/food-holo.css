@@ -1,0 +1,111 @@
+.ordering-detail-art:has(.food-holo) {
+  border: 0;
+  background: none;
+}
+
+.food-holo {
+  margin: 0;
+  padding: 16px 0;
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  gap: 17px;
+}
+
+.food-holo-stage {
+  position: relative;
+  width: min(84%, 355px);
+  aspect-ratio: 0.91;
+  touch-action: pan-y;
+  border-radius: 16px;
+}
+
+.food-holo-stage:focus-visible {
+  outline: 2px solid var(--order-ink);
+  outline-offset: 8px;
+}
+
+.food-holo-card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  padding: clamp(7px, 1vw, 11px);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1.5px solid #392a23;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(127deg, transparent 0 2px, #fff8 2.4px, transparent 3.4px),
+    conic-gradient(from var(--foil-angle), #eee6c5, #adc6d3, #ffe3a7, #805c58, #f6ceae, #c6f7e1, #8f7978, #f9edc9, #eee6c5);
+  box-shadow: inset 0 0 0 2px #fff6, 0 2px 0 #523e29,
+    0 13px 17px -9px #68421f76, 0 26px 40px -19px #8a59346b;
+}
+
+.food-holo-print {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #5e4432;
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse at var(--light-x) var(--light-y), #fffee9c9, transparent 58%),
+    radial-gradient(ellipse at 50% 48%, #ffeaa5 12%, transparent 65%),
+    linear-gradient(var(--foil-angle), #c18a65, #f5d78c 27%, #fae9b3 52%, #edb77a 82%, #bd8a5a);
+}
+
+.food-holo-print::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px #fff5, inset 0 0 28px #77501f1c;
+}
+
+.food-holo-print > .ordering-model-preview {
+  inset: 3% 4%;
+}
+
+.ordering-detail-art .food-holo-print > .ordering-cover {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  padding: 20% 24%;
+}
+.ordering-detail-art .food-holo-print > .ordering-cover img {
+  filter: drop-shadow(0 8px 10px #3822182e);
+}
+
+@media (max-width: 760px) {
+  .food-holo { padding: 10px 0 7px; gap: 11px; }
+  .food-holo-stage { width: min(75%, 320px); aspect-ratio: 1.12; }
+}
+
+/* The homepage supplies the yellow backdrop. Only the transparent model moves. */
+.food-holo-stage.food-holo-stage--hero {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.food-holo-stage--hero:focus-visible {
+  outline: 2px solid var(--welcome-ink);
+  outline-offset: -4px;
+}
+
+.food-holo-object {
+  position: absolute;
+  inset: 0;
+}
+
+.food-holo-object[data-floating]:has(.is-ready) {
+  animation: food-holo-hover 2.25s ease-in-out infinite alternate;
+}
+
+@keyframes food-holo-hover {
+  from { translate: 0 -1.3%; }
+  to { translate: 0 1.3%; }
+}

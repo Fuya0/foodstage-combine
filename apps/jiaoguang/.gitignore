@@ -1,0 +1,66 @@
+node_modules/
+/音效库/
+dist/
+test-results/
+playwright-report/
+.superpowers/
+.env
+.env.*
+!.env.example
+*.log
+__pycache__/
+*.pyc
+
+# Local asset auditions and PR review downloads
+.audio-candidates/
+.pr1-audio-review/
+pr1-review.zip
+
+# Local 3D generation scratch, bundled runtime, secrets and review/experiment pages
+artifacts/aholo-lux3d-runtime/
+*.private.json
+public/drink-comparison/
+public/drink-comparison.html
+public/food-redo-v2-models/
+public/food-redo-v2-models.html
+public/food-redo-v2-references/
+public/food-redo-v2-review.html
+
+# Local agent work products; retain only portable regression sources
+/.codex/*
+!/.codex/playwright.config.ts
+!/.codex/tests/
+/.codex/tests/*
+!/.codex/tests/*.spec.ts
+
+# Final runtime checkout; original assets and process evidence remain local
+/AGENTS.md
+/artifacts/
+/assets/*/source/
+/assets/*/processed/
+/assets/*/reference/
+/assets/*/provenance*.json
+/assets/*/pipeline/*.json
+/assets/reports/
+/public/models/
+/docs/screenshots/
+/docs/superpowers/
+# Historical process documents retained locally
+/docs/bite-game-verification.md
+/docs/food-focus-verification.md
+/docs/food-redo-v2-spec.md
+/docs/food-showcase-production.md
+/docs/food-showcase-reference-prompts.json
+/docs/lux3d-route-investigation.md
+/docs/mobile-redesign-verification.md
+/docs/model-optimization.md
+/docs/sound-prompts.md
+/docs/task-1-report.md
+/docs/task-2-report.md
+/docs/three-food-assets-delivery.md
+/docs/verification.md
+/docs/white-space-redesign-verification.md
+
+/public/models-mobile/
+
+/public/models-desktop/

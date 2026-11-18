@@ -1,0 +1,26 @@
+{
+  "name": "foodstage-combine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "食刻美食街：两家餐厅的3D菜单、虚拟试吃和点单，一份源码和一个部署入口。",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fuya0/foodstage-combine.git"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "typecheck": "node scripts/check.mjs typecheck",
+    "test": "node scripts/check.mjs test",
+    "test:browser": "node scripts/build.mjs && playwright test --config apps/food-street/playwright.config.ts"
+  }
+}

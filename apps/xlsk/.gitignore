@@ -1,0 +1,9 @@
+node_modules/
+/音效库/
+dist/
+.DS_Store
+*.log
+.codex/
+artifacts/
+验收/截图/
+验收/截图-GLB/
