@@ -12,7 +12,7 @@ test("门户保持原美食街风格，选店前不加载3D资源", async ({ pag
   const models: string[] = [];
   page.on("request", request => { if (/\.glb(?:\?|$)/.test(request.url())) models.push(request.url()); });
   await page.goto("./");
-  await expect(page.locator(".welcome-copy h1")).toHaveText("食刻美食街");
+  await expect(page.locator(".page-intro h1")).toHaveText("食刻美食街");
   await page.screenshot({ path: `${output}/${info.project.name}-welcome.png`, fullPage: true });
   await page.getByRole("button", { name: "开街逛逛" }).click();
   await expect(page).toHaveURL(/#shops$/);
@@ -117,4 +117,46 @@ test.describe("触屏试吃资源和交互", () => {
       expect(failures).toEqual([]);
     });
   }
+});
+
+
+test("两页标题和导语锚点一致，冗余说明已删除", async ({ page }) => {
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('./');
+    const before = await page.locator('.page-intro').evaluate(element => {
+      const a = element.querySelector('.eyebrow')!.getBoundingClientRect(), b = element.querySelector('h1')!.getBoundingClientRect();
+      return [a.x, a.y, b.x, b.y];
+    });
+    await page.getByRole('button', { name: '开街逛逛' }).click();
+    const after = await page.locator('.page-intro').evaluate(element => {
+      const a = element.querySelector('.eyebrow')!.getBoundingClientRect(), b = element.querySelector('h1')!.getBoundingClientRect();
+      return [a.x, a.y, b.x, b.y];
+    });
+    after.forEach((value, i) => expect(Math.abs(value - before[i]!)).toBeLessThanOrEqual(1));
+    for (const text of ['两家小店已开档。点击营业店铺进入对应菜单，装修店铺暂时不开放。', '营业店铺可进入', '装修店铺暂不可进入', '每家店都有可旋转的 3D 菜品']) {
+      await expect(page.getByText(text, { exact: true })).toHaveCount(0);
+    }
+    await fits(page);
+  }
+});
+
+test("店铺意图预取只暖目标店入口资源，不请求模型", async ({ page, baseURL }) => {
+  const modelRequests: string[] = [];
+  page.on('request', request => { if (/\.glb(?:\?|$)/.test(request.url())) modelRequests.push(request.url()); });
+  await page.goto('./#shops');
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(250);
+  expect(await page.locator('link[data-store-prefetch]').count()).toBe(0);
+  await page.locator('[data-store="burger"]').hover();
+  await expect(page.locator('link[data-store-prefetch]')).not.toHaveCount(0);
+  const hints = await page.locator('link[data-store-prefetch]').evaluateAll(nodes => nodes.map(node => ({ href: (node as HTMLLinkElement).href, as: (node as HTMLLinkElement).as })));
+  const prefix = new URL('jiaoguang/', baseURL!).href;
+  expect(hints.every(hint => hint.href.startsWith(prefix))).toBe(true);
+  expect(hints.every(hint => hint.href === prefix ? hint.as === '' : ['script', 'style'].includes(hint.as))).toBe(true);
+  expect(hints.some(hint => hint.as === 'script')).toBe(true);
+  expect(modelRequests).toEqual([]);
+  // Hints never execute the target store or create a hidden WebGL context.
+  await expect(page.locator('canvas')).toHaveCount(0);
+  await expect(page).toHaveURL(/#shops$/);
 });

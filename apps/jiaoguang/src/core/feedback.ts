@@ -12,6 +12,8 @@ let audioContext: AudioContext | undefined;
 /** Decoded one-shots keyed by URL; a failed entry is dropped so a later try can heal it. */
 const decoded = new Map<string, Promise<AudioBuffer | null>>();
 let playbackGeneration = 0;
+type Mouthful = { ended: Promise<void>; generation: number; completionRequested: boolean };
+let latestMouthful: Mouthful | undefined;
 const active = new Map<AudioScheduledSourceNode, () => void>();
 const activeRecordings = new Map<AudioScheduledSourceNode, GainNode>();
 /** Cues share cancellation, but never participate in chewing's replacement/crossfade. */
@@ -27,12 +29,14 @@ export function cancelBiteAudio(): void {
   activeRecordings.clear();
 }
 
-function trackSource(source: AudioScheduledSourceNode, nodes: AudioNode[]): () => void {
+function trackSource(source: AudioScheduledSourceNode, nodes: AudioNode[], ended?: () => void): () => void {
   const cleanup = () => {
+    if (!active.has(source)) return;
     active.delete(source);
     activeRecordings.delete(source);
     activeMilestones.delete(source);
     for (const node of nodes) node.disconnect();
+    ended?.();
   };
   active.set(source, cleanup);
   source.addEventListener('ended', cleanup, { once: true });
@@ -129,7 +133,7 @@ function playMilestoneBuffer(context: AudioContext, buffer: AudioBuffer, kind: '
     gain.connect(context.destination);
     cleanup = trackSource(source, nodes);
     activeMilestones.add(source);
-    // Cues follow stage/finished UI and remain independent from mouthful replacement.
+    // Stage cues remain independent from mouthful replacement.
     source.start(context.currentTime);
   } catch {
     try { source?.stop(); } catch { /* May never have started. */ }
@@ -138,7 +142,7 @@ function playMilestoneBuffer(context: AudioContext, buffer: AudioBuffer, kind: '
   }
 }
 
-async function playMilestone(kind: 'transition' | 'complete', stage: number): Promise<void> {
+async function playMilestone(kind: 'transition' | 'complete', stage: number, isCurrent = () => true): Promise<void> {
   const generation = playbackGeneration;
   const ready = (async () => {
     const context = ensureContext();
@@ -154,16 +158,35 @@ async function playMilestone(kind: 'transition' | 'complete', stage: number): Pr
       ready,
       new Promise<null>(resolve => { timer = setTimeout(() => resolve(null), 35); }),
     ]);
-    if (!result || generation !== playbackGeneration || result.context.state !== 'running') return;
+    if (!result || generation !== playbackGeneration || !isCurrent() || result.context.state !== 'running') return;
     playMilestoneBuffer(result.context, result.buffer, kind, stage);
   } finally {
     if (timer !== undefined) clearTimeout(timer);
   }
 }
 
-/** Optional stage cues; cancellation, including scheduled victory, uses cancelBiteAudio. */
+/** Completion follows the audio tail, independently of finished UI and stage cues. */
+async function completeAfterMouthful(stage: number): Promise<void> {
+  const mouthful = latestMouthful;
+  if (mouthful?.completionRequested) return;
+  if (mouthful) mouthful.completionRequested = true;
+  const generation = mouthful?.generation ?? playbackGeneration;
+  const page = globalThis.document;
+  let wasHidden = page?.hidden ?? false;
+  const visibility = () => { if (page.hidden) wasHidden = true; };
+  const isCurrent = () => generation === playbackGeneration && latestMouthful === mouthful && !wasHidden && !page?.hidden;
+  page?.addEventListener('visibilitychange', visibility);
+  try {
+    await mouthful?.ended;
+    if (isCurrent()) await playMilestone('complete', stage, isCurrent);
+  } finally {
+    page?.removeEventListener('visibilitychange', visibility);
+  }
+}
+
+/** Optional cues; cancellation, including a queued completion, uses cancelBiteAudio. */
 export function milestoneFeedback(settings: Settings, kind: 'transition' | 'complete', stage: number): void {
-  if (settings.sound) void playMilestone(kind, stage).catch(() => {});
+  if (settings.sound) void (kind === 'complete' ? completeAfterMouthful(stage) : playMilestone(kind, stage)).catch(() => {});
 }
 
 /** URLs for this mouthful, most specific first. Drinks sip; they never chew. */
@@ -184,7 +207,9 @@ function rotated<T>(items: readonly T[]): T[] {
   return [...items.slice(start), ...items.slice(0, start)];
 }
 
-function playBuffer(context: AudioContext, buffer: AudioBuffer, level: number, tint?: SoundTint): void {
+function playBuffer(context: AudioContext, buffer: AudioBuffer, level: number, tint?: SoundTint): Promise<void> {
+  let ended!: () => void;
+  const finished = new Promise<void>(resolve => { ended = resolve; });
   const nodes: AudioNode[] = [];
   let source: AudioBufferSourceNode | undefined;
   let cleanup: (() => void) | undefined;
@@ -228,7 +253,7 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, level: number, t
     source.connect(highpass);
     tail.connect(gain);
     gain.connect(context.destination);
-    cleanup = trackSource(source, nodes);
+    cleanup = trackSource(source, nodes, ended);
     activeRecordings.set(source, gain);
     for (const [voice, voiceCleanup] of active) {
       if (!activeRecordings.has(voice) && !activeMilestones.has(voice)) {
@@ -248,6 +273,7 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, level: number, t
     }
     source.start(start);
     source.stop(end);
+    return finished;
   } catch (error) {
     try { source?.stop(); } catch { /* May never have started. */ }
     if (cleanup) cleanup();
@@ -258,7 +284,7 @@ function playBuffer(context: AudioContext, buffer: AudioBuffer, level: number, t
 }
 
 /** Fallback for devices that cannot load the samples: the original soft two-beat mouth tone. */
-function playSynthBite(context: AudioContext, finishing: boolean): void {
+function playSynthBite(context: AudioContext, finishing: boolean): Promise<void> {
   // The fallback is a single mouthful too; a later bite replaces its scheduled voices.
   for (const [source, cleanup] of active) {
     if (activeMilestones.has(source)) continue;
@@ -267,10 +293,11 @@ function playSynthBite(context: AudioContext, finishing: boolean): void {
   }
   const nodes: AudioNode[] = [];
   const sources: AudioScheduledSourceNode[] = [];
+  const endings: Promise<void>[] = [];
   const track = <T extends AudioNode>(node: T): T => { nodes.push(node); return node; };
   const voice = (source: AudioScheduledSourceNode, chain: AudioNode[], start: number, duration: number) => {
     sources.push(source);
-    trackSource(source, [source, ...chain]);
+    endings.push(new Promise<void>(resolve => { trackSource(source, [source, ...chain], resolve); }));
     source.start(start);
     source.stop(start + duration);
   };
@@ -327,6 +354,7 @@ function playSynthBite(context: AudioContext, finishing: boolean): void {
     for (const source of sources) active.get(source)?.();
     for (const node of nodes) node.disconnect();
   }
+  return Promise.all(endings).then(() => {});
 }
 
 async function playBite(sound: FoodSound | undefined, role: BiteRole, interaction: FoodInteraction, stage: number): Promise<void> {
@@ -357,12 +385,12 @@ async function playBite(sound: FoodSound | undefined, role: BiteRole, interactio
     const context = result?.context ?? audioContext;
     if (!context || context.state !== 'running') return;
     if (result?.buffer) {
-      try { playBuffer(context, result.buffer, staged?.level ?? DEFAULT_LEVEL, staged?.tint); return; }
+      try { await playBuffer(context, result.buffer, staged?.level ?? DEFAULT_LEVEL, staged?.tint); return; }
       catch { /* A failed recording graph is released before synthesizing. */ }
     }
     // A drink without sip recordings stays quiet: the chewing synth would be a lie.
     if (interaction === 'drink') return;
-    playSynthBite(context, role === 'finish');
+    await playSynthBite(context, role === 'finish');
   } finally {
     if (timer !== undefined) clearTimeout(timer);
   }
@@ -371,7 +399,7 @@ async function playBite(sound: FoodSound | undefined, role: BiteRole, interactio
 export function biteFeedback(settings: Settings, sound?: FoodSound, role: BiteRole = 'chew', interaction: FoodInteraction = 'solid', stage = 0): void {
   if (settings.sound) {
     // Browser policy and device failures must never interrupt the interaction.
-    void playBite(sound, role, interaction, stage).catch(() => {});
+    latestMouthful = { ended: playBite(sound, role, interaction, stage).catch(() => {}), generation: playbackGeneration, completionRequested: false };
   }
 
   if (settings.haptics) {

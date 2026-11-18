@@ -11,7 +11,7 @@ python tools/assets.py verify --runtime-only
 
 These package assets:inventory/assets:verify commands work without source or processed archives. Runtime inventory updates manifest.runtimeFiles from the sole final public/models-runtime root while preserving existing provenance fields. The manifest records every final and compatibility GLB, including files outside the current catalog. Runtime roots must be exactly {"unified":"public/models-runtime"}. Menu previews and tasting at every viewport share those files. The current 32 files cover 24 catalog stages plus four chocolate and four canned compatibility stages.
 
-Production Vite builds disable wholesale public copying. Only public/models-runtime models registered in runtimeFiles, plus public/foods and public/audio, enter the static output. Development public URLs retain their existing behavior.
+Production Vite builds disable wholesale public copying. Only public/models-runtime models registered in runtimeFiles, plus menu-referenced public/foods images and public/audio, enter the static output. Development public URLs retain their existing behavior.
 
 ## Optional local archive processing
 

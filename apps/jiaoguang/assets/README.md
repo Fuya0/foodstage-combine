@@ -23,7 +23,7 @@ package 的 assets:inventory 和 assets:verify 已分别使用这两个命令。
 
 正式替换最终模型后应重新 inventory，再 verify、类型检查、单测、生产构建和浏览器外观/交互验收。当前无入口的兼容 GLB 仍要登记；不要仅从 catalog 推断整个发布清单。
 
-生产 Vite 插件只打包 runtimeFiles 登记的 public/models-runtime 模型及 public/foods、public/audio；旧 public/models、models-mobile、models-desktop 与本机调试/候选资源不自动复制。开发服务器的 public 行为保持。
+生产 Vite 插件只打包 runtimeFiles 登记的 public/models-runtime 模型及当前菜单引用的 public/foods 图片、public/audio；旧 public/models、models-mobile、models-desktop 与本机调试/候选资源不自动复制。开发服务器的 public 行为保持。
 
 ## 可选本地高级加工
 

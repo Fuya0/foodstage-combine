@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 import type { Plugin } from 'vite';
+import { menuItems } from './src/data/menu';
 import { readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 
@@ -47,7 +48,15 @@ function runtimePublicAssets(): Plugin {
         inside(publicRoot, directory);
         emit(resolve(root, item.path), item.path.slice('public/'.length), directory);
       }
-      for (const name of ['foods', 'audio']) {
+      const imagesRoot = realpathSync(resolve(publicRoot, 'foods'));
+      inside(publicRoot, imagesRoot);
+      for (const cover of new Set(menuItems.map(item => item.cover))) {
+        if (!/^\/foods\/[a-z0-9/_-]+\.(?:png|svg|webp|jpe?g|avif)$/i.test(cover)) {
+          throw new Error(`Unsafe menu image path: ${cover}`);
+        }
+        emit(resolve(publicRoot, cover.slice(1)), cover.slice(1), imagesRoot);
+      }
+      for (const name of ['audio']) {
         const directory = realpathSync(resolve(publicRoot, name));
         inside(publicRoot, directory);
         const visit = (current: string, prefix: string, ancestors: Set<string>) => {

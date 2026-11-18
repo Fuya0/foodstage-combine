@@ -36,10 +36,12 @@ function audioBoundary(state = 'running') {
       };
       return result;
     };
+    const events = new EventTarget();
     const result = {
       kind, type: '', buffer: null as unknown, frequency: parameter(), gain: parameter(), Q: parameter(), playbackRate: parameter(),
       connect: vi.fn(), disconnect: vi.fn(), start: vi.fn((_when?: number) => {}), stop: vi.fn((_when?: number) => {}),
-      addEventListener: vi.fn(),
+      addEventListener: vi.fn((event: string, callback: () => void, options?: AddEventListenerOptions) => events.addEventListener(event, callback, options)),
+      end: () => events.dispatchEvent(new Event('ended')),
     };
     return result;
   }
@@ -188,7 +190,7 @@ describe('milestoneFeedback', () => {
     expect(nodes).toHaveLength(0);
   });
 
-  it.each([true, false])('keeps cues and chewing independent when recording availability is %s', async (recordingAvailable) => {
+  it.each([true, false])('keeps stage cues and chewing independent when recording availability is %s', async (recordingAvailable) => {
     const { nodes } = audioBoundary();
     const fetch = stubFetch();
     fetch.mockImplementation(async (url) => {
@@ -200,7 +202,7 @@ describe('milestoneFeedback', () => {
     await flush();
     const chewing = nodes.filter((entry) => entry.kind === 'source' || entry.kind === 'oscillator');
     const stopsBeforeCue = chewing.map((entry) => entry.stop.mock.calls.length);
-    milestoneFeedback(settings, 'complete', 3);
+    milestoneFeedback(settings, 'transition', 3);
     await flush();
     expect(chewing.map((entry) => entry.stop.mock.calls.length)).toEqual(stopsBeforeCue);
     const cue = nodes.filter((entry) => entry.kind === 'source').at(-1)!;
@@ -235,10 +237,198 @@ describe('milestoneFeedback', () => {
     const sources = nodes.filter((entry) => entry.kind === 'source');
     expect(sources).toHaveLength(2);
     expect(sources[0]!.start).toHaveBeenCalledWith(4);
-    // Finished UI already follows the last chewing animation; its cue must start now.
+    // With no mouthful to wait for, completion starts immediately.
     expect(sources[1]!.start).toHaveBeenCalledWith(4);
     expect(sources[1]!.playbackRate.value).toBe(1);
     expect(nodes.filter((entry) => entry.kind === 'gain').map((entry) => entry.gain.value)).toEqual([0.25, 0.38]);
+  });
+});
+
+
+describe('completion after the final mouthful', () => {
+  const sources = (nodes: ReturnType<typeof audioBoundary>['nodes']) => nodes.filter(node => node.kind === 'source');
+
+  it('waits for the actual final recording ended event while stage cues remain immediate', async () => {
+    const { context, nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    const final = sources(nodes)[0]!;
+    milestoneFeedback(settings, 'transition', 3);
+    milestoneFeedback(settings, 'complete', 3);
+    await flush();
+    expect(sources(nodes)).toHaveLength(2);
+    // Neither UI completion nor a guessed duration owns audio completion.
+    context.currentTime += 60;
+    await flush();
+    expect(sources(nodes)).toHaveLength(2);
+    expect(final.stop).toHaveBeenCalledTimes(1);
+    final.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(3);
+    expect(sources(nodes)[2]!.start).toHaveBeenCalledWith(64);
+    expect(sources(nodes)[2]!.playbackRate.value).toBe(1);
+  });
+
+  it('also waits when finished UI arrives while the final sample is still decoding', async () => {
+    const { context, nodes } = audioBoundary();
+    stubFetch();
+    let release!: () => void;
+    context.decodeAudioData.mockImplementationOnce(() => new Promise(resolve => { release = () => resolve({ duration: 2 }); }));
+    const { biteFeedback, milestoneFeedback } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    milestoneFeedback(settings, 'complete', 3);
+    await flush();
+    expect(sources(nodes)).toHaveLength(0);
+    release();
+    await flush();
+    expect(sources(nodes)).toHaveLength(1);
+    sources(nodes)[0]!.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(2);
+  });
+
+  it('waits for every voice in the final fallback mouthful', async () => {
+    const { nodes } = audioBoundary();
+    const fetch = stubFetch(false);
+    const { biteFeedback, milestoneFeedback } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    const mouthful = nodes.filter(node => node.kind === 'source' || node.kind === 'oscillator');
+    fetch.mockImplementation(async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(64) }));
+    milestoneFeedback(settings, 'complete', 3);
+    await flush();
+    expect(sources(nodes)).toHaveLength(2);
+    for (const voice of mouthful.slice(0, -1)) voice.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(2);
+    mouthful.at(-1)!.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(3);
+  });
+
+  it('drops queued completion at the shared exit, replay and mute cancellation boundary', async () => {
+    const { nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback, cancelBiteAudio } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    const final = sources(nodes)[0]!;
+    milestoneFeedback(settings, 'complete', 3);
+    await flush();
+    cancelBiteAudio();
+    final.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(1);
+  });
+
+  it('does not resurrect a canceled mouthful when finished UI requests completion later', async () => {
+    const { nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback, cancelBiteAudio } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    const final = sources(nodes)[0]!;
+    cancelBiteAudio();
+    final.end();
+    await flush();
+    milestoneFeedback(settings, 'complete', 3);
+    await flush();
+    expect(sources(nodes)).toHaveLength(1);
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    milestoneFeedback(settings, 'complete', 3);
+    sources(nodes)[1]!.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(3);
+  });
+
+  it('drops queued completion if a later mouthful replaces the final one', async () => {
+    const { nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    const final = sources(nodes)[0]!;
+    milestoneFeedback(settings, 'complete', 3);
+    biteFeedback(settings, singleChew);
+    await flush();
+    final.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(2);
+  });
+
+  it('plays completion once for a final mouthful even if requested repeatedly', async () => {
+    const { nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    const final = sources(nodes)[0]!;
+    milestoneFeedback(settings, 'complete', 3);
+    milestoneFeedback(settings, 'complete', 3);
+    final.end();
+    await flush();
+    milestoneFeedback(settings, 'complete', 3);
+    final.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(2);
+  });
+
+  it('drops queued completion after a hidden interval even if visible before ended', async () => {
+    const document = Object.assign(new EventTarget(), { hidden: false });
+    vi.stubGlobal('document', document);
+    const { nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    const final = sources(nodes)[0]!;
+    milestoneFeedback(settings, 'complete', 3);
+    document.hidden = true;
+    document.dispatchEvent(new Event('visibilitychange'));
+    document.hidden = false;
+    document.dispatchEvent(new Event('visibilitychange'));
+    final.end();
+    await flush();
+    expect(sources(nodes)).toHaveLength(1);
+  });
+
+  it.each(['cancel', 'hidden', 'replacement'] as const)('drops completion when %s occurs during cue decoding after the mouthful ended', async (reason) => {
+    const document = Object.assign(new EventTarget(), { hidden: false });
+    vi.stubGlobal('document', document);
+    const { context, nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback, cancelBiteAudio } = await import('./feedback');
+    biteFeedback(settings, sound, 'finish');
+    await flush();
+    let release!: () => void;
+    context.decodeAudioData.mockImplementationOnce(() => new Promise(resolve => { release = () => resolve({ duration: 1 }); }));
+    milestoneFeedback(settings, 'complete', 3);
+    sources(nodes)[0]!.end();
+    await flush();
+    if (reason === 'cancel') cancelBiteAudio();
+    else if (reason === 'replacement') biteFeedback(settings, singleChew);
+    else {
+      document.hidden = true;
+      document.dispatchEvent(new Event('visibilitychange'));
+      document.hidden = false;
+    }
+    release();
+    await flush();
+    expect(sources(nodes)).toHaveLength(reason === 'replacement' ? 2 : 1);
+  });
+
+  it('does not block completion when an unavailable drink has no mouthful source', async () => {
+    const { nodes } = audioBoundary();
+    stubFetch();
+    const { biteFeedback, milestoneFeedback } = await import('./feedback');
+    biteFeedback(settings, { chews: [] }, 'finish', 'drink');
+    milestoneFeedback(settings, 'complete', 3);
+    await flush();
+    expect(sources(nodes)).toHaveLength(1);
+    expect(nodes.filter(node => node.kind === 'oscillator')).toHaveLength(0);
   });
 });
 

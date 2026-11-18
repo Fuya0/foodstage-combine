@@ -74,11 +74,10 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .arrow { width: 38px; height: 20px; flex: none; transition: transform 160ms ease; }
 
 /* 开始页 */
-.welcome-hero { flex: 1; display: grid; grid-template-columns: minmax(360px, .78fr) minmax(540px, 1.22fr); align-items: center; gap: 24px; min-height: 0; padding-block: 22px 12px; }
+.welcome-hero { flex: 1; display: grid; grid-template-columns: minmax(360px, .78fr) minmax(540px, 1.22fr); align-items: center; gap: 24px; min-height: 0; padding-block: 12px 0; }
 .welcome-copy { position: relative; z-index: 3; max-width: 480px; padding-block: 24px; }
-.welcome-copy h1 { margin: 17px 0 25px; font-size: clamp(76px, 7.4vw, 112px); line-height: .96; letter-spacing: -.07em; }
-.welcome-copy h1 span { position: relative; display: inline-block; color: var(--red); }
-.welcome-copy h1 span::after { content: ""; position: absolute; left: 4%; right: -2%; bottom: -10px; height: 12px; border-top: 4px solid var(--yellow); border-radius: 50%; transform: rotate(-2deg); }
+.welcome-content .page-intro h1 span { position: relative; display: inline-block; color: var(--red); }
+.welcome-content .page-intro h1 span::after { content: ""; position: absolute; left: 4%; right: -2%; bottom: -10px; height: 12px; border-top: 4px solid var(--yellow); border-radius: 50%; transform: rotate(-2deg); }
 .welcome-lead { max-width: 420px; margin-bottom: 27px; color: var(--muted); font-size: 18px; line-height: 1.85; }
 .primary-action { display: inline-flex; align-items: center; justify-content: space-between; gap: 32px; min-width: 232px; min-height: 60px; padding: 15px 23px 15px 27px; border: 2px solid var(--ink); border-radius: 10px 14px 9px 13px; color: var(--sheet); background: var(--red); box-shadow: 5px 5px 0 var(--ink); font-size: 17px; font-weight: 650; transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease; }
 .primary-action:hover { transform: translateY(-2px); background: var(--red-dark); box-shadow: 7px 7px 0 var(--ink); }
@@ -117,13 +116,11 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .preview-spark--two { right: 1%; top: 41%; width: 34px; height: 34px; transform: rotate(12deg); }
 
 /* 选店页 */
-.directory-content { padding-block: 25px 18px; }
-.directory-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
-.directory-heading h1 { margin: 8px 0 0; font-size: clamp(38px, 4vw, 52px); line-height: 1.15; letter-spacing: -.04em; }
+
+
 .back-action { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 0; border: 0; border-bottom: 1.5px solid transparent; background: transparent; font-size: 14px; font-weight: 600; transition: border-color 160ms ease; }
 .back-action:hover { border-color: currentColor; }
 .back-action:hover .arrow { transform: translateX(-3px); }
-.directory-lead { margin: 13px 0 18px; color: var(--muted); font-size: 15px; line-height: 1.7; }
 .street-scene { position: relative; padding-top: 22px; }
 .street-scene > .festoon { top: -14px; height: 62px; opacity: .78; }
 .shops-grid { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
@@ -176,17 +173,10 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .construction-cone i { position: absolute; left: 3px; right: 3px; top: 20px; border-top: 6px solid var(--sheet); }
 .street-pavement { display: flex; align-items: center; justify-content: space-around; height: 29px; margin-inline: 9px; border-bottom: 2px solid var(--ink); background: #ddd1b9; }
 .street-pavement span { width: 13%; margin-top: 8px; border-top: 2px dashed var(--sheet); }
-.directory-footnote { display: flex; align-items: center; gap: 25px; margin-top: 14px; color: var(--muted); font-size: 13px; }
-.directory-footnote > span { display: inline-flex; align-items: center; gap: 7px; }
-.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-.legend-dot--open { background: #4f7f59; }
-.legend-dot--closed { background: #c28a36; }
-.footnote-tip { margin-left: auto; }
 
 @media (max-width: 1180px) {
   .page-wrap { width: min(calc(100% - 64px), 1380px); }
   .welcome-hero { grid-template-columns: minmax(330px, .8fr) minmax(460px, 1.2fr); gap: 10px; }
-  .welcome-copy h1 { font-size: 82px; }
   .street-preview { min-height: 440px; }
   .preview-stores { height: 340px; }
   .shops-grid { gap: 11px; }
@@ -198,7 +188,6 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 
 @media (max-width: 920px) {
   .welcome-hero { grid-template-columns: minmax(300px, .85fr) minmax(390px, 1.15fr); }
-  .welcome-copy h1 { font-size: 70px; }
   .welcome-lead { font-size: 16px; }
   .street-preview { height: 450px; min-height: 420px; }
   .preview-stores { height: 305px; }
@@ -207,8 +196,6 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
   .shops-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
   .shop-art { aspect-ratio: 4 / 4.1; }
   .shop-body h2, .shop-category { min-height: 0; }
-  .footnote-tip { width: 100%; margin-left: 0; }
-  .directory-footnote { flex-wrap: wrap; }
 }
 
 @media (max-width: 700px) {
@@ -222,9 +209,7 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
   .welcome-screen { overflow: hidden; }
   .welcome-hero { display: flex; flex: 1; flex-direction: column; align-items: stretch; gap: 0; padding-block: 26px 8px; }
   .welcome-copy { max-width: none; padding-block: 0; }
-  .welcome-copy h1 { margin: 13px 0 18px; font-size: clamp(50px, 14.5vw, 64px); line-height: 1.04; letter-spacing: -.06em; }
-  .welcome-copy h1 br { display: none; }
-  .welcome-copy h1 span::after { bottom: -8px; border-top-width: 3px; }
+  .welcome-content .page-intro h1 span::after { bottom: -8px; border-top-width: 3px; }
   .welcome-lead { max-width: 340px; margin-bottom: 20px; font-size: 16px; line-height: 1.75; }
   .primary-action { width: 100%; min-height: 55px; padding-block: 12px; }
   .welcome-fact { margin-top: 19px; }
@@ -241,13 +226,10 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
   .preview-cloud, .preview-spark { display: none; }
   .welcome-footer { display: none; }
 
-  .directory-content { padding-block: 21px 24px; }
-  .directory-heading { align-items: flex-end; gap: 8px; }
-  .directory-heading .eyebrow { font-size: 13px; }
-  .directory-heading h1 { margin-top: 7px; font-size: clamp(28px, 8.5vw, 36px); white-space: nowrap; }
+
+
   .back-action { flex: none; gap: 3px; font-size: 13px; }
   .back-action .arrow { width: 25px; }
-  .directory-lead { margin-block: 12px 16px; font-size: 14px; }
   .street-scene { padding-top: 0; }
   .street-scene > .festoon, .street-pavement { display: none; }
   .shops-grid { grid-template-columns: 1fr; gap: 15px; }
@@ -262,7 +244,6 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
   .construction-tape strong { font-size: 18px; }
   .construction-tape small { font-size: 13px; }
   .construction-plank { left: 2%; width: 96%; }
-  .directory-footnote { gap: 10px 18px; margin-top: 20px; }
 }
 
 @media (max-width: 390px) {
@@ -279,7 +260,6 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 }
 
 @media (max-height: 760px) and (min-width: 701px) {
-  .welcome-copy h1 { font-size: 72px; }
   .street-preview { height: 475px; min-height: 420px; }
   .preview-stores { height: 320px; }
   .welcome-footer { min-height: 44px; }
@@ -288,4 +268,44 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
   .shop-card--open:hover, .primary-action:hover, .shop-art .store-svg { transform: none !important; }
+}
+
+/* The same intro slot anchors the start page and shop directory at every width. */
+.page-content { padding-block: 30px 24px; }
+.welcome-content { flex: 1; display: flex; flex-direction: column; }
+.page-intro { position: relative; flex: none; min-width: 0; margin-bottom: 24px; }
+.page-intro .eyebrow { min-height: 32px; font-size: 14px; line-height: 1.4; }
+.page-intro h1 { margin: 12px 0 0; font-size: clamp(40px, 4.5vw, 64px); line-height: 1.15; letter-spacing: -.045em; }
+.page-intro .back-action { position: absolute; top: 0; right: 0; min-height: 32px; padding-block: 4px; }
+.welcome-content .page-intro h1 span { margin-left: .12em; }
+.welcome-hero { grid-template-columns: minmax(320px, .78fr) minmax(460px, 1.22fr); }
+.welcome-copy { padding-block: 12px; }
+.street-preview { height: min(53vh, 500px); min-height: 405px; }
+.preview-stores { height: 335px; }
+@media (max-width: 1180px) {
+  .welcome-hero { grid-template-columns: minmax(280px, .8fr) minmax(390px, 1.2fr); }
+  .street-preview { min-height: 390px; }
+  .preview-stores { height: 300px; }
+}
+@media (max-width: 920px) and (min-width: 701px) {
+  .welcome-hero { grid-template-columns: minmax(240px, .8fr) minmax(340px, 1.2fr); }
+  .street-preview { height: 410px; min-height: 380px; }
+  .preview-stores { height: 285px; }
+}
+@media (max-width: 700px) {
+  .page-content { padding-block: 22px 24px; }
+  .page-intro { margin-bottom: 22px; }
+  .page-intro .eyebrow { font-size: 13px; letter-spacing: .02em; }
+  .page-intro h1 { margin-top: 12px; font-size: clamp(30px, 8.2vw, 40px); }
+  .page-intro .back-action { font-size: 13px; }
+  .welcome-hero { padding-top: 0; }
+  .welcome-copy { padding-block: 0; }
+  .street-preview { height: 285px; min-height: 255px; }
+  .preview-stores { height: 205px; }
+}
+
+@media (min-width: 701px) {
+  .welcome-hero { align-items: start; }
+  .welcome-copy { padding-top: 24px; }
+  .street-preview { align-self: start; }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { stores, type Store } from "./config";
 import { StoreArt } from "./components/Storefront";
+import { prepareStoreHints, warmStore } from "./preload";
 
 type Screen = "welcome" | "shops";
 
@@ -75,15 +76,19 @@ function Welcome({ onEnter }: { onEnter: () => void }) {
   return (
     <main className="welcome-screen">
       <header className="site-header page-wrap"><Brand /><OpenStatus /></header>
-      <section className="welcome-hero page-wrap">
-        <div className="welcome-copy">
+      <section className="welcome-content page-content page-wrap">
+        <div className="page-intro">
           <p className="eyebrow"><span aria-hidden="true">✦</span> 两份菜单，一条小街</p>
-          <h1 ref={headingRef} tabIndex={-1}>食刻<br /><span>美食街</span></h1>
-          <p className="welcome-lead">从手作汉堡到东南亚小菜，挑一家喜欢的小店，转着看、点着吃。</p>
-          <button className="primary-action" type="button" onClick={onEnter}>开街逛逛 <Arrow /></button>
-          <p className="welcome-fact"><strong>2</strong> 家餐厅可进店点单<span aria-hidden="true">·</span><strong>3</strong> 家小店装修待开</p>
+          <h1 ref={headingRef} tabIndex={-1}>食刻<span>美食街</span></h1>
         </div>
-        <StreetPreview />
+        <div className="welcome-hero">
+          <div className="welcome-copy">
+            <p className="welcome-lead">从手作汉堡到东南亚小菜，挑一家喜欢的小店，转着看、点着吃。</p>
+            <button className="primary-action" type="button" onClick={onEnter}>开街逛逛 <Arrow /></button>
+            <p className="welcome-fact"><strong>2</strong> 家餐厅可进店点单<span aria-hidden="true">·</span><strong>3</strong> 家小店装修待开</p>
+          </div>
+          <StreetPreview />
+        </div>
       </section>
       <footer className="welcome-footer page-wrap"><span>虚拟试吃 · 3D 菜单 · 轻松点单</span><span>今天，想逛哪一家？</span></footer>
     </main>
@@ -102,6 +107,17 @@ function Construction() {
 }
 
 function ShopCard({ store }: { store: Store }) {
+  const intentTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const intentController = useRef<AbortController | null>(null);
+  const cancelIntent = () => { if (intentTimer.current !== null) clearTimeout(intentTimer.current); intentTimer.current = null; intentController.current?.abort(); intentController.current = null; };
+  useEffect(() => cancelIntent, []);
+  const startIntent = () => {
+    cancelIntent();
+    const href = store.href;
+    if (store.status !== "open" || !href) return;
+    const controller = new AbortController(); intentController.current = controller;
+    intentTimer.current = setTimeout(() => { intentTimer.current = null; void warmStore(href, controller.signal); }, 180);
+  };
   const art = <div className={`shop-art shop-art--${store.id}`}><StoreArt kind={store.id} />{store.status === "renovating" && <Construction />}</div>;
   const body = (
     <div className="shop-body">
@@ -118,29 +134,27 @@ function ShopCard({ store }: { store: Store }) {
     </div>
   );
   if (store.status === "open" && store.href) {
-    return <a className={`shop-card shop-card--open shop-card--${store.id}`} href={store.href} data-store={store.id} data-status="open" aria-label={`进入${store.name}点单`}>{art}{body}</a>;
+    return <a className={`shop-card shop-card--open shop-card--${store.id}`} href={store.href} onPointerMove={event => { if (event.pointerType === "mouse" && (event.movementX || event.movementY)) startIntent(); }} onPointerLeave={cancelIntent} onFocus={startIntent} onBlur={cancelIntent} data-store={store.id} data-status="open" aria-label={`进入${store.name}点单`}>{art}{body}</a>;
   }
   return <article className={`shop-card shop-card--closed shop-card--${store.id}`} data-store={store.id} data-status="renovating" aria-label={`${store.name}，正在装修`}>{art}{body}</article>;
 }
 
 function ShopDirectory({ onBack }: { onBack: () => void }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
-  useEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
+  useEffect(() => { headingRef.current?.focus({ preventScroll: true }); prepareStoreHints(); }, []);
   return (
     <main className="directory-screen">
       <header className="site-header page-wrap"><Brand onClick={onBack} /><OpenStatus /></header>
-      <section className="directory-content page-wrap">
-        <div className="directory-heading">
+      <section className="directory-content page-content page-wrap">
+        <div className="directory-heading page-intro">
           <div><p className="eyebrow"><span aria-hidden="true">✦</span> 食刻美食街 · 店铺导览</p><h1 ref={headingRef} tabIndex={-1}>挑一家，进店点单</h1></div>
           <button className="back-action" type="button" onClick={onBack}><Arrow direction="left" />返回街口</button>
         </div>
-        <p className="directory-lead">两家小店已开档。点击营业店铺进入对应菜单，装修店铺暂时不开放。</p>
         <div className="street-scene">
           <Festoon />
           <div className="shops-grid">{stores.map((store) => <ShopCard key={store.id} store={store} />)}</div>
           <div className="street-pavement" aria-hidden="true"><span /><span /><span /><span /><span /><span /></div>
         </div>
-        <div className="directory-footnote"><span><i className="legend-dot legend-dot--open" />营业店铺可进入</span><span><i className="legend-dot legend-dot--closed" />装修店铺暂不可进入</span><span className="footnote-tip">每家店都有可旋转的 3D 菜品</span></div>
       </section>
     </main>
   );

@@ -44,6 +44,6 @@ strawberry-cake/
 
 ## 发布与可选高级流程
 
-菜单预览固定使用统一模型的第 0 阶段；手机和桌面试吃均加载同一 public/models-runtime 文件。runtimeRoots 必须恰好为 {"unified":"public/models-runtime"}；同一候选需在两类视口检查。当前统一包包含 24 个 catalog 阶段及 chocolate/canned 各 4 个兼容文件。生产包仅包含 manifest.runtimeFiles 列出的模型与正式 public/foods、public/audio 目录；原始 source/processed、legacy 模型和历史候选仍留本机，不随包发布。
+菜单预览固定使用统一模型的第 0 阶段；手机和桌面试吃均加载同一 public/models-runtime 文件。runtimeRoots 必须恰好为 {"unified":"public/models-runtime"}；同一候选需在两类视口检查。当前统一包包含 24 个 catalog 阶段及 chocolate/canned 各 4 个兼容文件。生产包仅包含 manifest.runtimeFiles 列出的模型与当前菜单引用的 public/foods 图片、public/audio 目录；原始 source/processed、legacy 模型和历史候选仍留本机，不随包发布。
 
 旧 scripts/optimize-models.mjs、build-desktop-models.py 及不带 --runtime-only 的 Python inventory/verify/sync 是依赖本地 archive 的高级加工工具。旧 simplify=0.35、降分辨率/WebP 配方包含有损步骤，不是本轮经过视觉复核的精度压缩配方；使用前应先做候选和外观比较。旧 inventory 保留统一发布清单，旧 sync 仅写旧 public/models-mobile、public/models-desktop，不向 models-runtime 发布。将已验收候选单独替换到统一目录后，再生成运行版 inventory 和 verify；它们保留原来源信息并移除旧 runtimeRoots 键。旧目录继续留本机且不进入生产包。详细规则见 [资产维护说明](../assets/README.md)。

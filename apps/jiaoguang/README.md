@@ -52,7 +52,7 @@ python tools/assets.py verify --runtime-only
 
 它们分别对应 `pnpm assets:inventory` 和 `pnpm assets:verify`。运行版 inventory 只读取统一目录的最终 GLB，更新 runtimeFiles、移除旧 runtimeRoots 键并保留 manifest 的原来源字段；verify 校验最终目录、覆盖、哈希、字节数、尺寸和内嵌资源，不读取 source/processed。
 
-生产 build 关闭整个 public 目录的自动复制：只按 runtimeFiles 复制 public/models-runtime 模型，并带上 public/foods、public/audio。legacy 模型、调试 HTML 和其他候选目录即使保留本机，也不会进入生产包。开发服务器仍保留原有 public 路径行为。
+生产 build 关闭整个 public 目录的自动复制：只按 runtimeFiles 复制 public/models-runtime 模型，并带上当前菜单引用的 public/foods 图片及 public/audio。旧组件插画不参与生产构建。legacy 模型、调试 HTML 和其他候选目录即使保留本机，也不会进入生产包。开发服务器仍保留原有 public 路径行为。
 
 ## 添加食物与本地高级加工
 

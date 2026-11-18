@@ -82,7 +82,9 @@ function PlayScreen({ item, food, settings, reduced, onSettingsChange, onBack }:
   useEffect(() => {
     if (settings.sound) { primeBiteAudio(food.sound); primeMilestoneAudio(); }
     else cancelBiteAudio();
-    return cancelBiteAudio;
+    const visibility = () => { if (document.hidden) cancelBiteAudio(); };
+    document.addEventListener('visibilitychange', visibility);
+    return () => { cancelBiteAudio(); document.removeEventListener('visibilitychange', visibility); };
   }, [food.sound, settings.sound]);
   useEffect(() => {
     entries.forEach((entry, stage) => { if (entry.status === 'ready') dispatch({ type: 'READY', stage, run: state.run }); });
