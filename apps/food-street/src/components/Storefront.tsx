@@ -95,7 +95,7 @@ function BurgerArt() {
       <path d="M49 127h222l-14-22H63Z" fill="#382218" />
       <rect x="78" y="39" width="164" height="89" rx="10" fill="#f8d66d" />
       <g transform="translate(87 50) scale(.53)"><BurgerIcon /></g>
-      <text x="174" y="91" fill="#382218" stroke="none" textAnchor="middle" fontSize="29" fontWeight="900" fontFamily="Arial, sans-serif">食刻</text>
+      <text x="174" y="91" fill="#382218" stroke="none" textAnchor="middle" fontSize="29" fontWeight="400" fontFamily="var(--display)">食刻</text>
       <text x="174" y="113" fill="#382218" stroke="none" textAnchor="middle" fontSize="11" fontWeight="700" fontFamily="Arial, sans-serif">FOODSTAGE</text>
       <path d="M47 145h226l-10 48H57Z" fill="#fff3d9" />
       <path d="m68 145 5 48M104 145l2 48M140 145v48M177 145l-2 48M213 145l-5 48M249 145l-8 48" fill="none" strokeWidth="18" stroke="#efb735" />
@@ -127,7 +127,7 @@ function SiamArt() {
       <path d="m78 73 19-24h126l19 24" fill="#c9573b" />
       <rect x="81" y="89" width="158" height="78" rx="4" fill="#f5eedf" />
       <g transform="translate(91 96) scale(.54)"><LotusIcon /></g>
-      <text x="179" y="122" fill="#173e35" stroke="none" textAnchor="middle" fontSize="22" fontWeight="600" fontFamily="Kaiti SC, STKaiti, serif">暹罗食刻</text>
+      <text x="179" y="122" fill="#173e35" stroke="none" textAnchor="middle" fontSize="22" fontWeight="400" fontFamily="var(--display)">暹罗食刻</text>
       <text x="179" y="145" fill="#a9402b" stroke="none" textAnchor="middle" fontSize="10" fontFamily="Arial, sans-serif" letterSpacing="1">SIAM SHIKE</text>
       <path d="M48 181h224l-12 35H60Z" fill="#edcf73" />
       <path d="M60 216c8 13 20 13 28 0 8 13 20 13 28 0 8 13 20 13 28 0 8 13 20 13 28 0 8 13 20 13 28 0 8 13 20 13 28 0" fill="none" />
@@ -151,7 +151,7 @@ function NoodleArt() {
       <path d="M54 102h212v252H54Z" fill="#7296a0" />
       <path d="M42 103h236L260 78H60Z" fill="#385865" />
       <rect x="88" y="43" width="144" height="69" rx="5" fill="#f1dfb8" />
-      <text x="160" y="87" fill="#385865" stroke="none" textAnchor="middle" fontSize="25" fontWeight="600" fontFamily="Kaiti SC, STKaiti, serif">巷口面馆</text>
+      <text x="160" y="87" fill="#385865" stroke="none" textAnchor="middle" fontSize="25" fontWeight="400" fontFamily="var(--display)">巷口面馆</text>
       <path d="M68 139h184v48H68Z" fill="#f5eedf" />
       <path d="M68 139h184M98 139v48M130 139v48M162 139v48M194 139v48M226 139v48" fill="none" />
       <path d="M69 187c10 13 20 13 29 0 10 13 21 13 32 0 10 13 21 13 32 0 10 13 21 13 32 0 10 13 21 13 32 0 9 12 17 12 25 0" fill="none" />
@@ -174,7 +174,7 @@ function CoffeeArt() {
       <path d="M46 113h228l-20-30H66Z" fill="#586c50" />
       <rect x="80" y="45" width="160" height="70" rx="35" fill="#f2e6cd" />
       <g transform="translate(89 54) scale(.48)"><CoffeeIcon /></g>
-      <text x="179" y="86" fill="#49674c" stroke="none" textAnchor="middle" fontSize="24" fontWeight="600" fontFamily="Kaiti SC, STKaiti, serif">山野咖啡</text>
+      <text x="179" y="86" fill="#49674c" stroke="none" textAnchor="middle" fontSize="24" fontWeight="400" fontFamily="var(--display)">山野咖啡</text>
       <path d="M62 139h196v51H62Z" fill="#e7d5b4" />
       <path d="m62 139 16 51M104 139l8 51M146 139v51M188 139l-8 51M230 139l-16 51" fill="none" stroke="#f7f0df" strokeWidth="16" />
       <path d="M62 139h196v51H62Z" fill="none" />
@@ -197,7 +197,7 @@ function DessertArt() {
       <path d="M45 112h230l-17-27H62Z" fill="#9f675c" />
       <rect x="72" y="42" width="176" height="73" rx="8" fill="#fff0cf" />
       <g transform="translate(80 50) scale(.5)"><CakeIcon /></g>
-      <text x="181" y="84" fill="#a65347" stroke="none" textAnchor="middle" fontSize="23" fontWeight="600" fontFamily="Kaiti SC, STKaiti, serif">甜品补给站</text>
+      <text x="181" y="84" fill="#a65347" stroke="none" textAnchor="middle" fontSize="23" fontWeight="400" fontFamily="var(--display)">甜品补给站</text>
       <path d="M48 139h224l-9 52H57Z" fill="#f8d9b5" />
       <path d="m70 139 4 52M111 139l2 52M152 139v52M193 139l-2 52M234 139l-4 52" fill="none" stroke="#fff8e9" strokeWidth="17" />
       <path d="M48 139h224l-9 52H57Z" fill="none" />

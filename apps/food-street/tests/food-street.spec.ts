@@ -14,7 +14,7 @@ test("门户保持原美食街风格，选店前不加载3D资源", async ({ pag
   await page.goto("./");
   await expect(page.locator(".page-intro h1")).toHaveText("食刻美食街");
   await page.screenshot({ path: `${output}/${info.project.name}-welcome.png`, fullPage: true });
-  await page.getByRole("button", { name: "开街逛逛" }).click();
+  await page.getByRole("button", { name: "去逛逛" }).click();
   await expect(page).toHaveURL(/#shops$/);
   await expect(page.locator("[data-status='open']")).toHaveCount(2);
   await expect(page.locator("[data-status='renovating']")).toHaveCount(3);
@@ -23,7 +23,7 @@ test("门户保持原美食街风格，选店前不加载3D资源", async ({ pag
   await page.screenshot({ path: `${output}/${info.project.name}-shops.png`, fullPage: true });
   expect(models).toEqual([]);
   await page.getByRole("button", { name: "返回街口" }).click();
-  await expect(page.getByRole("button", { name: "开街逛逛" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "去逛逛" })).toBeVisible();
 });
 
 for (const store of ["burger", "siam"] as const) {
@@ -54,7 +54,7 @@ test("手机和平板门户无横向溢出，装修店不可点击", async ({ pa
     await page.setViewportSize({ width, height: 900 });
     await page.goto("./");
     await fits(page);
-    await page.getByRole("button", { name: "开街逛逛" }).click();
+    await page.getByRole("button", { name: "去逛逛" }).click();
     await fits(page);
     await expect(page.locator("a[data-status='renovating']")).toHaveCount(0);
     await page.screenshot({ path: `${output}/${info.project.name}-shops-${width}.png`, fullPage: true });
@@ -128,7 +128,7 @@ test("两页标题和导语锚点一致，冗余说明已删除", async ({ page 
       const a = element.querySelector('.eyebrow')!.getBoundingClientRect(), b = element.querySelector('h1')!.getBoundingClientRect();
       return [a.x, a.y, b.x, b.y];
     });
-    await page.getByRole('button', { name: '开街逛逛' }).click();
+    await page.getByRole('button', { name: '去逛逛' }).click();
     const after = await page.locator('.page-intro').evaluate(element => {
       const a = element.querySelector('.eyebrow')!.getBoundingClientRect(), b = element.querySelector('h1')!.getBoundingClientRect();
       return [a.x, a.y, b.x, b.y];
@@ -142,9 +142,11 @@ test("两页标题和导语锚点一致，冗余说明已删除", async ({ page 
 });
 
 test("店铺意图预取只暖目标店入口资源，不请求模型", async ({ page, baseURL }) => {
+  await page.addInitScript(() => { Object.defineProperty(navigator, 'connection', { configurable: true, value: { saveData: false, effectiveType: '4g' } }); });
   const modelRequests: string[] = [];
   page.on('request', request => { if (/\.glb(?:\?|$)/.test(request.url())) modelRequests.push(request.url()); });
   await page.goto('./#shops');
+  await page.evaluate(() => document.fonts.ready);
   await page.mouse.move(0, 0);
   await page.waitForTimeout(250);
   expect(await page.locator('link[data-store-prefetch]').count()).toBe(0);

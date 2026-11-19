@@ -1,5 +1,13 @@
 @charset "UTF-8";
 
+@font-face {
+  font-family: "Food Street Display";
+  src: url("./assets/street-display.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --paper: #f5eedf;
   --paper-deep: #e9dfc9;
@@ -12,7 +20,7 @@
   --green: #315d4d;
   --blue: #73aeba;
   --line: rgba(59, 49, 40, .25);
-  --display: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif CJK SC", serif;
+  --display: "Food Street Display", "Microsoft YaHei", sans-serif;
   --body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   color: var(--ink);
   background: var(--paper);
@@ -40,7 +48,7 @@ button { color: inherit; cursor: pointer; }
 a { color: inherit; }
 svg { display: block; }
 h1, h2, p { margin-top: 0; }
-h1, h2 { font-family: var(--display); font-weight: 600; }
+h1, h2 { font-family: var(--display); font-weight: 400; }
 h1[tabindex="-1"]:focus { outline: none; }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--green); outline-offset: 5px; }
 ::selection { color: var(--sheet); background: var(--red); }
@@ -64,7 +72,7 @@ button.brand { cursor: pointer; }
 .brand-mark { width: 46px; height: 46px; flex: none; transition: transform 180ms ease; }
 button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .brand-copy { display: flex; flex-direction: column; }
-.brand-copy strong { font-family: var(--display); font-size: 24px; line-height: 1.1; letter-spacing: .03em; }
+.brand-copy strong { font-family: var(--display); font-size: 25px; font-weight:400; line-height: 1.15; letter-spacing: .02em; }
 .brand-copy small { margin-top: 5px; color: var(--muted); font-size: 13px; line-height: 1; letter-spacing: .08em; }
 .open-status { display: inline-flex; align-items: center; gap: 9px; min-height: 38px; padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: 9px 12px 8px 11px; background: var(--sheet); font-size: 13px; font-weight: 600; box-shadow: 2px 2px 0 rgba(59,49,40,.16); }
 .open-status i { width: 9px; height: 9px; border-radius: 50%; background: #4f7f59; box-shadow: 0 0 0 3px rgba(79,127,89,.14); }
@@ -83,9 +91,6 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .primary-action:hover { transform: translateY(-2px); background: var(--red-dark); box-shadow: 7px 7px 0 var(--ink); }
 .primary-action:hover .arrow { transform: translateX(3px); }
 .primary-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
-.welcome-fact { display: flex; align-items: baseline; gap: 8px; margin: 25px 0 0; color: var(--muted); font-size: 13px; }
-.welcome-fact strong { color: var(--red-dark); font-family: var(--display); font-size: 23px; font-weight: 600; }
-.welcome-fact span { margin-inline: 3px; }
 .welcome-footer { display: flex; align-items: center; justify-content: space-between; min-height: 54px; border-top: 1.5px solid var(--line); color: var(--muted); font-size: 13px; }
 
 .street-preview { position: relative; width: 100%; height: min(64vh, 590px); min-height: 470px; align-self: center; isolation: isolate; }
@@ -95,8 +100,8 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .street-arch::before, .street-arch::after { content: ""; position: absolute; bottom: 100%; width: 2px; height: 44px; background: var(--ink); }
 .street-arch::before { left: 27px; }
 .street-arch::after { right: 27px; }
-.street-arch span { font-family: var(--display); font-size: 29px; line-height: 1.1; letter-spacing: .06em; }
-.street-arch small { margin-top: 6px; color: #f3dfb5; font-size: 13px; }
+.street-arch span { font-family: var(--display); font-size: 31px; font-weight:400; line-height: 1.15; letter-spacing: .025em; }
+.street-arch small { margin-top: 7px; color: #f3dfb5; font-size: 12px; font-weight:600; letter-spacing:.025em; }
 .preview-stores { position: absolute; z-index: 2; left: 1%; right: 1%; bottom: 53px; display: flex; align-items: flex-end; justify-content: center; height: 385px; }
 .preview-store { position: relative; width: 34%; height: 100%; }
 .preview-store--burger { transform: translateX(8px); }
@@ -146,7 +151,7 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .shop-status--open i { background: #4f7f59; }
 .shop-status--renovating { color: #8b5928; }
 .shop-status--renovating i { background: #c28a36; }
-.shop-number { color: var(--muted); font-family: var(--display); font-size: 14px; }
+.shop-number { color: var(--muted); font-family: var(--body); font-size: 13px; font-variant-numeric:tabular-nums; }
 .shop-body h2 { min-height: 52px; margin: 9px 0 4px; font-size: 22px; line-height: 1.25; letter-spacing: -.02em; }
 .shop-category { min-height: 38px; margin-bottom: 11px; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .shop-action-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1.5px dashed var(--line); font-size: 14px; font-weight: 650; }
@@ -163,7 +168,7 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
 .construction-tape::before, .construction-tape::after { content: ""; position: absolute; top: -6px; width: 27px; height: 10px; background: rgba(245,238,223,.75); }
 .construction-tape::before { left: 12px; transform: rotate(-8deg); }
 .construction-tape::after { right: 12px; transform: rotate(7deg); }
-.construction-tape strong { font-family: var(--display); font-size: 21px; line-height: 1.1; letter-spacing: .06em; }
+.construction-tape strong { font-family: var(--display); font-size: 21px; font-weight:400; line-height: 1.1; letter-spacing: .03em; }
 .construction-tape small { margin-top: 4px; font-size: 13px; line-height: 1; letter-spacing: .08em; }
 .construction-plank { position: absolute; left: 7%; width: 85%; height: 17px; border: 2px solid var(--ink); background: #b68b5f; box-shadow: 2px 2px 0 rgba(59,49,40,.35); }
 .construction-plank::after { content: ""; position: absolute; left: 10px; right: 10px; top: 6px; border-top: 1px solid rgba(59,49,40,.45); }
@@ -212,7 +217,6 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
   .welcome-content .page-intro h1 span::after { bottom: -8px; border-top-width: 3px; }
   .welcome-lead { max-width: 340px; margin-bottom: 20px; font-size: 16px; line-height: 1.75; }
   .primary-action { width: 100%; min-height: 55px; padding-block: 12px; }
-  .welcome-fact { margin-top: 19px; }
   .street-preview { flex: 1; width: 100%; height: auto; min-height: 255px; max-height: 330px; margin-top: 3px; }
   .street-preview::before { height: 80%; top: 12%; }
   .street-preview .festoon { height: 53px; }
@@ -251,7 +255,6 @@ button.brand:hover .brand-mark { transform: rotate(-5deg); }
   .brand-copy small { display: none; }
   .open-status { padding-inline: 8px; }
   .welcome-hero { padding-top: 22px; }
-  .welcome-fact { gap: 6px; font-size: 13px; }
   .shop-card { grid-template-columns: 116px minmax(0, 1fr); }
   .shop-body { padding-inline: 12px; }
   .shop-body h2 { font-size: 21px; }

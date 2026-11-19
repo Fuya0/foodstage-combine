@@ -50,3 +50,11 @@
 @media (max-width: 360px) {
   .ordering-topbar { padding-inline: 12px; }
 }
+
+/* Ordinary same-site navigation keeps the current store state in browser storage. */
+.street-return-link { display:inline-flex; align-items:center; gap:5px; min-height:32px; padding:4px 0; color:inherit; font-size:12px; font-weight:700; line-height:1.4; text-decoration:none; white-space:nowrap; }
+.street-return-link > span { font-size:17px; line-height:1; }
+.street-return-link:hover { text-decoration:underline; text-underline-offset:4px; }
+.street-return-link:focus-visible { outline:2px solid currentColor; outline-offset:4px; border-radius:2px; }
+.welcome-header-actions { display:flex; align-items:center; justify-content:flex-end; gap:20px; }
+@media(max-width:600px) { .welcome-header-actions { flex-direction:column; align-items:flex-end; gap:0; } }

@@ -84,8 +84,7 @@ function Welcome({ onEnter }: { onEnter: () => void }) {
         <div className="welcome-hero">
           <div className="welcome-copy">
             <p className="welcome-lead">从手作汉堡到东南亚小菜，挑一家喜欢的小店，转着看、点着吃。</p>
-            <button className="primary-action" type="button" onClick={onEnter}>开街逛逛 <Arrow /></button>
-            <p className="welcome-fact"><strong>2</strong> 家餐厅可进店点单<span aria-hidden="true">·</span><strong>3</strong> 家小店装修待开</p>
+            <button className="primary-action" type="button" onClick={onEnter}>去逛逛 <Arrow /></button>
           </div>
           <StreetPreview />
         </div>

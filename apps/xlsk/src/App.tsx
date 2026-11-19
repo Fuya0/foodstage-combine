@@ -180,12 +180,12 @@ export default function App() {
     <div className={`app app--${screen}`}>
       {screen === "welcome" && (
         <main className="welcome-page" data-screen="welcome">
-          <div className="welcome-top"><Brand /><span className="edition">东南亚风味</span></div>
+          <div className="welcome-top"><Brand /><div className="welcome-header-actions"><a className="street-return-link" href="../#shops"><span aria-hidden="true">←</span>返回美食街</a><span className="edition">东南亚风味</span></div></div>
           <section className="welcome-layout">
             <div className="welcome-copy">
               <p className="eyebrow">一本可以点的手绘菜单</p>
               <h1>先翻一翻，<br />再决定<span>吃什么。</span></h1>
-              <p className="welcome-lead">{dishes.length} 道东南亚菜，把食材、份量和辣度都画清楚。拖动菜品看看，再把喜欢的夹进小票。</p>
+              <p className="welcome-lead">{dishes.length} 道东南亚菜，把食材、份量和辣度都画清楚。<br />拖动菜品看看，再把喜欢的夹进小票。</p>
               <div className="service-choice" aria-label="就餐方式">
                 <button type="button" className={session.mode === "dine-in" ? "selected" : ""} onClick={() => setSession({ ...session, mode: "dine-in" })}><span>堂食</span><small>选人数与桌号</small></button>
                 <button type="button" className={session.mode === "takeaway" ? "selected" : ""} onClick={() => setSession({ ...session, mode: "takeaway" })}><span>打包</span><small>选好直接下单</small></button>
@@ -219,7 +219,7 @@ export default function App() {
                     <button className="dish-card-open" type="button" onClick={() => selectDish(item.id)} aria-label={`查看${item.name}详情`}>
                       <span className="dish-image-wrap"><img src={assetUrl(item.image)} alt={item.name} loading="lazy" />{!item.available && <b className="soldout-stamp">今日售罄</b>}</span>
                       <span className="dish-card-copy"><small>{item.thai}</small><strong>{item.name}</strong><span>{item.description}</span></span>
-                      <span className="dish-card-bottom"><b>{money(item.price)}</b><small>/ {item.unit}</small><i>翻开 →</i></span>
+                      <span className="dish-card-bottom"><b className="menu-price">{money(item.price)}</b><small>/ {item.unit}</small><i>翻开 →</i></span>
                     </button>
                     {item.available && item.tastingModels && <button className="card-tasting" type="button" onClick={() => startTasting(item.id)} aria-label={`虚拟试吃${item.name}`}><span>✦</span> 虚拟试吃 <strong>咬一口 →</strong></button>}
                   </article>

@@ -149,7 +149,7 @@ export default function MenuRibbon({ settings, onSelect }: { settings: Settings;
             onClick={() => onSelect(dish.id)}
           >
             <img src={assetUrl(dish.image)} alt="" draggable={false} />
-            <span><strong>{dish.name}</strong><small>{money(dish.price)} / {dish.unit}</small></span>
+            <span><strong>{dish.name}</strong><small><b className="menu-price">{money(dish.price)}</b><span> / {dish.unit}</span></small></span>
           </button>
         ))}
       </div>

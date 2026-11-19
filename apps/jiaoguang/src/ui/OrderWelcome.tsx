@@ -35,7 +35,7 @@ export function OrderWelcome({ onChoose, reducedMotion }: {
     <div className="welcome-inner">
       <header className="welcome-header">
         <div className="welcome-brand"><UtensilsCrossed size={28} strokeWidth={2.2} aria-hidden="true" />食刻</div>
-        <span className="welcome-service">自助点单<span className="welcome-checker" aria-hidden="true" /></span>
+        <div className="welcome-header-actions"><a className="street-return-link" href="../#shops"><span aria-hidden="true">←</span>返回美食街</a><span className="welcome-service">自助点单<span className="welcome-checker" aria-hidden="true" /></span></div>
       </header>
 
       <div className="welcome-poster">
